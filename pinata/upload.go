@@ -2,6 +2,7 @@ package pinata
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,7 +12,7 @@ import (
 	"path/filepath"
 )
 
-func uploadPinFile(url string, auth string, fileLoc string, pinataOptions string, pinataMetaData string) ([]byte, error) {
+func (pinata *Pinata) uploadPinFile(url string, auth string, fileLoc string, name string, keyValues *[]interface{}) ([]byte, error) {
 	var body []byte = nil
 	payload := &bytes.Buffer{}
 
@@ -34,8 +35,24 @@ func uploadPinFile(url string, auth string, fileLoc string, pinataOptions string
 		return body, err
 	}
 
-	_ = writer.WriteField("pinataOptions", pinataOptions)
-	_ = writer.WriteField("pinataMetadata", pinataMetaData)
+	pinataOptionsJson, errParse := json.Marshal(pinata.pinataOptions)
+
+	if errParse != nil {
+		err := fmt.Errorf("Some Error equaried %q", errParse.Error())
+		return body, err
+	}
+
+	pinataMetadata := &PinataMetadata{Name: name, KeyValues: keyValues}
+
+	pinataMetadataJson, errParse := json.Marshal(pinataMetadata)
+
+	if errParse != nil {
+		err := fmt.Errorf("Some Error equaried %q", errParse.Error())
+		return body, err
+	}
+
+	_ = writer.WriteField("pinataOptions", string(pinataOptionsJson))
+	_ = writer.WriteField("pinataMetadata", string(pinataMetadataJson))
 
 	errWriter := writer.Close()
 

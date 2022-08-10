@@ -3,3 +3,6 @@ build:
 
 run:
 	go run ./cmd/client/main.go
+
+example_query:
+	go build -o bin/query ./examples/query/main.go

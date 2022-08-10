@@ -1,5 +1,5 @@
 package pinata
 
-func uploadJson() {
+func uploadJson(url string, auth string, fileLoc string, pinataOptions string, pinataMetaData string) {
 
 }
