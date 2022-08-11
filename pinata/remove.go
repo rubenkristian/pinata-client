@@ -5,17 +5,17 @@ import (
 	"net/http"
 )
 
-func removeFile(auth string) ([]byte, error) {
+func (pinata *Pinata) removeFile(cid string) ([]byte, error) {
 	var result []byte = nil
 	clientRequest := &http.Client{}
 
-	req, errReq := http.NewRequest(string(DELETE), string(UNPIN), nil)
+	req, errReq := http.NewRequest(string(DELETE), string(UNPIN)+cid, nil)
 
 	if errReq != nil {
 		return nil, errReq
 	}
 
-	req.Header.Add("Authorization", auth)
+	req.Header.Add("Authorization", pinata.authentication)
 
 	res, errRes := clientRequest.Do(req)
 
