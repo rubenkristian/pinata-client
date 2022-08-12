@@ -38,7 +38,7 @@ type PinataMetadata struct {
 	KeyValues *[]interface{} `json:"keyvalues"`
 }
 
-func createRequest(url string, auth string, cidVersion int8, wrapWithDirectory bool) *Pinata {
+func CreatePinata(url string, auth string, cidVersion int8, wrapWithDirectory bool) *Pinata {
 	return &Pinata{
 		url:            url,
 		authentication: auth,

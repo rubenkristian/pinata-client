@@ -6,3 +6,6 @@ run:
 
 example_query:
 	go build -o bin/query ./examples/query/main.go
+
+example_pin:
+	go build -o bin/pin ./examples/pin/main.go
