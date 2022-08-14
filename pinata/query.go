@@ -5,7 +5,14 @@ import (
 	"net/http"
 )
 
-func (pinata *Pinata) queryPinata(statusList string, sizeMin int32) ([]byte, error) {
+type Params struct {
+	Key         string
+	Value       string
+	SecondValue *string
+	Operator    string
+}
+
+func (pinata *Pinata) queryPinata(statusList string, sizeMin int32, params [10]Params) ([]byte, error) {
 	var result []byte = nil
 	clientRequest := &http.Client{}
 
@@ -13,6 +20,14 @@ func (pinata *Pinata) queryPinata(statusList string, sizeMin int32) ([]byte, err
 
 	if sizeMin > 0 {
 		url += "&pinSizeMin=" + string(sizeMin)
+	}
+
+	for _, param := range params {
+		if param.SecondValue == nil {
+			url += "&metadata[keyvalues]={\"" + param.Key + "\":{\"value\":\"" + param.Value + "\", \"op\":\"" + param.Operator + "\"}}"
+		} else {
+			url += "&metadata[keyvalues]={\"" + param.Key + "\":{\"value\":\"" + param.Value + "\", \"secondValue\":\"" + *param.SecondValue + "\", \"op\":\"" + param.Operator + "\"}}"
+		}
 	}
 
 	req, errReq := http.NewRequest(string(GET), url, nil)
