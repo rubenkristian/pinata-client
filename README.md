@@ -1,20 +1,20 @@
-## Experimental Command
- - auth
+### Experimental Command
+ - ## auth
   ```bash
   pinata auth :auth_key
   ```
   create file for store key api before use other command, put your JWT Key to create file in current folder to save your key for request pinata API.
- - list
+ - ## list
   ```bash
   pinata list :file_name :query
   ```
   save result of query to file (or create file if not exists).
- - unpin-hash
+ - ## unpin-hash
   ```bash
   pinata unpin-hash :hash
   ```
   remove/unpin file by hash id from pinata.
- - unpin-query
+ - ## unpin-query
   ```bash
   pinata unpin-query :query
   ```

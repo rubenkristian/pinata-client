@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"rubenkristian.github.com/pinata-client/pinata"
@@ -24,37 +23,45 @@ func main() {
 			return
 		}
 
-		fileAut, err := ioutil.ReadFile(currentDir + "/pinata-auth.json")
-		if err != nil {
-			fmt.Println("No file pinata-auth.json in this directory, please set auth key by using \"client auth {jwt key}\"")
-			return
-		}
-
-		authPinata := &PinataAuth{}
-		err = json.Unmarshal(fileAut, authPinata)
-		if err != nil {
-			fmt.Println("Failed to parse json file, please check file or set auth key by using \"client auth {jwt key}\"")
-			return
-		}
-
-		pinataApi := pinata.CreatePinata(authPinata.Key, 0, false)
 		switch args[0] {
 		case "auth":
 			createAuthFile(&currentDir, args[1])
 		case "list":
+			pinataApi := initPinata(&currentDir)
 			if len(args) >= 2 {
 				listFile(pinataApi, &currentDir, args[1], args[2])
 			} else {
 				fmt.Println("must have name file for save result of query")
 			}
 		case "unpin-hash":
+			pinataApi := initPinata(&currentDir)
 			unpinByHash(pinataApi, args)
 		case "unpin-query":
+			pinataApi := initPinata(&currentDir)
 			unpinByQuery(pinataApi, args)
 		}
 	} else {
 		fmt.Println("no command")
 	}
+}
+
+func initPinata(currDir *string) *pinata.Pinata {
+	fileAut, err := os.ReadFile(*currDir + "/pinata-auth.json")
+	if err != nil {
+		fmt.Println("No file pinata-auth.json in this directory, please set auth key by using \"client auth {jwt key}\"")
+		return nil
+	}
+
+	authPinata := &PinataAuth{}
+	err = json.Unmarshal(fileAut, authPinata)
+	if err != nil {
+		fmt.Println("Failed to parse json file, please check file or set auth key by using \"client auth {jwt key}\"")
+		return nil
+	}
+
+	pinataApi := pinata.CreatePinata(authPinata.Key, 0, false)
+
+	return pinataApi
 }
 
 func unpinByHash(pinata *pinata.Pinata, params []string) {
