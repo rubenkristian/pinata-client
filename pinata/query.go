@@ -1,34 +1,36 @@
 package pinata
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
 type Params struct {
 	Key         string
-	Value       string
-	SecondValue *string
+	Value       interface{}
+	SecondValue *interface{}
 	Operator    string
 }
 
-func (pinata *Pinata) queryPinata(statusList string, name *string, params []Params) ([]byte, error) {
+type QueryOneParams struct {
+	Value    interface{} `json:"value"`
+	Operator string      `json:"op"`
+}
+
+type QueryTwoParams struct {
+	Value       interface{} `json:"value"`
+	SecondValue interface{} `json:"secondValue"`
+	Operator    string      `json:"op"`
+}
+
+func (pinata *Pinata) queryPinata(query *string) ([]byte, error) {
 	var result []byte = nil
 	clientRequest := &http.Client{}
 
-	url := string(QUERYFILES) + "?status=" + statusList
+	url := string(QUERYFILES) + "?" + *query
 
-	if name != nil {
-		url += "&metadata[name]=" + (*name)
-	}
-
-	for _, param := range params {
-		if param.SecondValue == nil {
-			url += "&metadata[keyvalues]={\"" + param.Key + "\":{\"value\":\"" + param.Value + "\", \"op\":\"" + param.Operator + "\"}}"
-		} else {
-			url += "&metadata[keyvalues]={\"" + param.Key + "\":{\"value\":\"" + param.Value + "\", \"secondValue\":\"" + *param.SecondValue + "\", \"op\":\"" + param.Operator + "\"}}"
-		}
-	}
+	fmt.Println(url)
 
 	req, errReq := http.NewRequest(string(GET), url, nil)
 

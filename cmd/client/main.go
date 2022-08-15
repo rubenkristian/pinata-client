@@ -16,61 +16,66 @@ type PinataAuth struct {
 func main() {
 	args := os.Args[1:]
 
-	currentDir, errDir := os.Getwd()
-	if errDir != nil {
-		fmt.Println("Error")
-		fmt.Println(errDir)
-		return
-	}
-
-	fileAut, err := ioutil.ReadFile(currentDir + "/pinata-auth.json")
-	if err != nil {
-		fmt.Println("No file pinata-auth.json in this directory, please set auth key by using \"client auth {jwt key}\"")
-		return
-	}
-
-	authPinata := &PinataAuth{}
-	err = json.Unmarshal(fileAut, authPinata)
-	if err != nil {
-		fmt.Println("Failed to parse json file, please check file or set auth key by using \"client auth {jwt key}\"")
-		return
-	}
-
-	pinataApi := pinata.CreatePinata(authPinata.Key, 0, false)
-	switch args[0] {
-	case "auth":
-		createAuthFile(&currentDir, args[1])
-	case "list":
-		if len(args) >= 2 {
-			listFile(pinataApi, &currentDir, args[1])
-		} else {
-			fmt.Println("must have name file for save result of query")
+	if len(args) > 0 {
+		currentDir, errDir := os.Getwd()
+		if errDir != nil {
+			fmt.Println("Error")
+			fmt.Println(errDir)
+			return
 		}
-	case "unpin":
-		if len(args) >= 3 {
-			if args[1] == "--hash" {
-				unpin(pinataApi, args[2])
-			} else if args[1] == "--name" {
-				unpinByName(pinataApi, args[2])
+
+		fileAut, err := ioutil.ReadFile(currentDir + "/pinata-auth.json")
+		if err != nil {
+			fmt.Println("No file pinata-auth.json in this directory, please set auth key by using \"client auth {jwt key}\"")
+			return
+		}
+
+		authPinata := &PinataAuth{}
+		err = json.Unmarshal(fileAut, authPinata)
+		if err != nil {
+			fmt.Println("Failed to parse json file, please check file or set auth key by using \"client auth {jwt key}\"")
+			return
+		}
+
+		pinataApi := pinata.CreatePinata(authPinata.Key, 0, false)
+		switch args[0] {
+		case "auth":
+			createAuthFile(&currentDir, args[1])
+		case "list":
+			if len(args) >= 2 {
+				listFile(pinataApi, &currentDir, args[1], args[2])
+			} else {
+				fmt.Println("must have name file for save result of query")
 			}
-		} else {
-			fmt.Println("unpin must have flag --hash, --name")
+		case "unpin-hash":
+			unpinByHash(pinataApi, args)
+		case "unpin-query":
+			unpinByQuery(pinataApi, args)
 		}
+	} else {
+		fmt.Println("no command")
 	}
 }
 
-func unpinByName(pinata *pinata.Pinata, name string) {
-	pinataBody := pinata.QueryFiles("pin", &name)
-
-	pinata.RemoveFiles(pinataBody.Rows)
+func unpinByHash(pinata *pinata.Pinata, params []string) {
+	if len(params) == 2 {
+		pinata.RemoveByHash(params[1])
+	} else {
+		fmt.Println("must have hash after command")
+	}
 }
 
-func unpin(pinata *pinata.Pinata, cid string) {
-	pinata.RemoveByHash(cid)
+func unpinByQuery(pinata *pinata.Pinata, params []string) {
+	if len(params) >= 2 {
+		pinataBody := pinata.QueryFiles(params[1])
+		pinata.RemoveFiles(pinataBody.Rows)
+	} else {
+		fmt.Println("put your query after command")
+	}
 }
 
-func listFile(pinata *pinata.Pinata, currDir *string, fileName string) {
-	list := pinata.QueryFiles("pin", nil)
+func listFile(pinata *pinata.Pinata, currDir *string, fileName string, query string) {
+	list := pinata.QueryFiles(query)
 
 	file, _ := json.MarshalIndent(list, "", "\t")
 
@@ -81,7 +86,7 @@ func listFile(pinata *pinata.Pinata, currDir *string, fileName string) {
 		fmt.Println(authFileErr)
 		return
 	} else {
-		fmt.Println("Done to save query result to " + (*currDir) + "/" + fileName + ".json")
+		fmt.Println("Saved query result to " + (*currDir) + "/" + fileName + ".json")
 	}
 }
 
@@ -106,3 +111,28 @@ func createAuthFile(currDir *string, key string) {
 		return
 	}
 }
+
+// func parseArgs(params []string) (string, any) {
+// 	var command string = params[0]
+
+// 	var lenParams int = len(params)
+
+// 	if lenParams > 1 {
+// 		return "", nil
+// 	} else if command == "auth" {
+// 		return command, params[1]
+// 	} else if command == "list" {
+
+// 	}
+// }
+
+// func parseQuery(params []string) {
+// 	var lenParams int = len(params)
+// 	var index int = 0
+
+// 	reg, _ := regexp.Compile("--([a-z]+)-([a-zA-Z0-9]+)")
+// 	for index < lenParams {
+// 		param := params[index]
+// 		if param == "--"
+// 	}
+// }

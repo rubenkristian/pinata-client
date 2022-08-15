@@ -127,9 +127,9 @@ func (pinata *Pinata) DataUsage() {
 
 }
 
-func (pinata *Pinata) QueryFiles(status string, name *string) PinataBody {
+func (pinata *Pinata) QueryFiles(query string) PinataBody {
 	bodyPinata := &PinataBody{}
-	body, err := pinata.queryPinata(status, name, nil)
+	body, err := pinata.queryPinata(&query)
 
 	if err != nil {
 		fmt.Println("Error")
