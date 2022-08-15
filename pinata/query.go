@@ -12,14 +12,14 @@ type Params struct {
 	Operator    string
 }
 
-func (pinata *Pinata) queryPinata(statusList string, sizeMin int32, params [10]Params) ([]byte, error) {
+func (pinata *Pinata) queryPinata(statusList string, name *string, params []Params) ([]byte, error) {
 	var result []byte = nil
 	clientRequest := &http.Client{}
 
 	url := string(QUERYFILES) + "?status=" + statusList
 
-	if sizeMin > 0 {
-		url += "&pinSizeMin=" + string(sizeMin)
+	if name != nil {
+		url += "&metadata[name]=" + (*name)
 	}
 
 	for _, param := range params {
@@ -36,7 +36,7 @@ func (pinata *Pinata) queryPinata(statusList string, sizeMin int32, params [10]P
 		return nil, errReq
 	}
 
-	req.Header.Add("Authorization", pinata.authentication)
+	req.Header.Add("Authorization", "Bearer "+pinata.authentication)
 
 	res, errRes := clientRequest.Do(req)
 

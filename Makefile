@@ -1,5 +1,8 @@
 build:
-	go build -o bin/client ./cmd/client/main.go
+	GOOS=windows GOARCH=386 go build -o bin/windows/pinata.exe ./cmd/client/main.go
+	GOOS=darwin GOARCH=arm64 go build -o bin/darwin/arm/pinata ./cmd/client/main.go
+	GOOS=darwin GOARCH=amd64 go build -o bin/darwin/x64-x86/pinata ./cmd/client/main.go
+	GOOS=linux GOARCH=amd64 go build -o bin/linux/x64-x86/pinata ./cmd/client/main.go
 
 run:
 	go run ./cmd/client/main.go

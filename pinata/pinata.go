@@ -1,5 +1,11 @@
 package pinata
 
+import (
+	"encoding/json"
+	"fmt"
+	"sync"
+)
+
 type Method string
 
 type Url string
@@ -23,7 +29,6 @@ const (
 )
 
 type Pinata struct {
-	url            string
 	authentication string
 	pinataOptions  *PinataOptions
 }
@@ -38,16 +43,42 @@ type PinataMetadata struct {
 	KeyValues *[]interface{} `json:"keyvalues"`
 }
 
-func CreatePinata(url string, auth string, cidVersion int8, wrapWithDirectory bool) *Pinata {
+type PinataRegion struct {
+	CurrentReplicationCount int64  `json:"currentReplicationCount"`
+	DesiredReplicationCount int64  `json:"desiredReplicationCount"`
+	RegionId                string `json:"regionId"`
+}
+
+type PinataMetaData struct {
+	Name      string      `json:"name"`
+	KeyValues interface{} `json:"keyvalues"`
+}
+
+type PinataRow struct {
+	Id           string         `json:"id"`
+	IpfsPinHash  string         `json:"ipfs_pin_hash"`
+	Size         int64          `json:"size"`
+	UserId       string         `json:"user_id"`
+	DatePinned   string         `json:"date_pinned"`
+	DateUnpinned string         `json:"date_unpinned"`
+	MetaData     PinataMetaData `json:"metadata"`
+	Regions      []PinataRegion `json:"regions"`
+}
+
+type PinataBody struct {
+	Count int64       `json:"count"`
+	Rows  []PinataRow `json:"rows"`
+}
+
+func CreatePinata(auth string, cidVersion int8, wrapWithDirectory bool) *Pinata {
 	return &Pinata{
-		url:            url,
 		authentication: auth,
 		pinataOptions:  &PinataOptions{CidVersion: cidVersion, WrapWithDirectory: wrapWithDirectory},
 	}
 }
 
 func (pinata *Pinata) PinFile(fileLoc string, name string, keyvalues *[]interface{}) string {
-	_, err := pinata.uploadPinFile(pinata.url, pinata.authentication, fileLoc, name, keyvalues)
+	_, err := pinata.uploadPinFile(string(PINFILE), pinata.authentication, fileLoc, name, keyvalues)
 
 	if err != nil {
 		return "Error Pin File"
@@ -72,14 +103,39 @@ func (pinata *Pinata) UpdateMetaData() {
 
 }
 
-func (pinata *Pinata) RemoveFiles() {
+func (pinata *Pinata) RemoveByHash(hash string) {
+	pinata.removeFile(hash)
+	fmt.Println("Finished remove file with hash " + hash)
+}
 
+func (pinata *Pinata) RemoveFiles(rows []PinataRow) {
+	var wg sync.WaitGroup
+	wg.Add(len(rows))
+	for _, row := range rows {
+		go func(hash string) {
+			defer wg.Done()
+			pinata.removeFile(hash)
+			fmt.Println("Remove file with hash: " + hash)
+		}(row.IpfsPinHash)
+	}
+
+	wg.Wait()
+	fmt.Println("Finished remove files")
 }
 
 func (pinata *Pinata) DataUsage() {
 
 }
 
-func (pinata *Pinata) QueryFiles() {
+func (pinata *Pinata) QueryFiles(status string, name *string) PinataBody {
+	bodyPinata := &PinataBody{}
+	body, err := pinata.queryPinata(status, name, nil)
 
+	if err != nil {
+		fmt.Println("Error")
+	}
+
+	json.Unmarshal(body, bodyPinata)
+
+	return *bodyPinata
 }
