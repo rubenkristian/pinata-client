@@ -23,29 +23,37 @@ func main() {
 			return
 		}
 
+		pinataApi := initPinata(&currentDir, args[0])
+
 		switch args[0] {
 		case "auth":
 			createAuthFile(&currentDir, args[1])
+		case "help":
+			help()
 		case "list":
-			pinataApi := initPinata(&currentDir)
 			if len(args) >= 2 {
 				listFile(pinataApi, &currentDir, args[1], args[2])
 			} else {
 				fmt.Println("must have name file for save result of query")
 			}
 		case "unpin-hash":
-			pinataApi := initPinata(&currentDir)
 			unpinByHash(pinataApi, args)
 		case "unpin-query":
-			pinataApi := initPinata(&currentDir)
 			unpinByQuery(pinataApi, args)
+		case "pin-file":
+			pinFile(pinataApi, "")
+		case "pin-json":
+			pinJson(pinataApi, "")
 		}
 	} else {
 		fmt.Println("no command")
 	}
 }
 
-func initPinata(currDir *string) *pinata.Pinata {
+func initPinata(currDir *string, command string) *pinata.Pinata {
+	if command == "auth" {
+		return nil
+	}
 	fileAut, err := os.ReadFile(*currDir + "/pinata-auth.json")
 	if err != nil {
 		fmt.Println("No file pinata-auth.json in this directory, please set auth key by using \"client auth {jwt key}\"")
@@ -62,6 +70,18 @@ func initPinata(currDir *string) *pinata.Pinata {
 	pinataApi := pinata.CreatePinata(authPinata.Key, 0, false)
 
 	return pinataApi
+}
+
+func help() {
+	// TODO: help console
+}
+
+func pinFile(pinata *pinata.Pinata, fileDir string) {
+
+}
+
+func pinJson(pinata *pinata.Pinata, json string) {
+
 }
 
 func unpinByHash(pinata *pinata.Pinata, params []string) {
@@ -98,7 +118,6 @@ func listFile(pinata *pinata.Pinata, currDir *string, fileName string, query str
 }
 
 func createAuthFile(currDir *string, key string) {
-
 	if key == "" {
 		fmt.Println("Error: must have value")
 		return
