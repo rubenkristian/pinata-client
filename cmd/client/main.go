@@ -118,28 +118,3 @@ func createAuthFile(currDir *string, key string) {
 		return
 	}
 }
-
-// func parseArgs(params []string) (string, any) {
-// 	var command string = params[0]
-
-// 	var lenParams int = len(params)
-
-// 	if lenParams > 1 {
-// 		return "", nil
-// 	} else if command == "auth" {
-// 		return command, params[1]
-// 	} else if command == "list" {
-
-// 	}
-// }
-
-// func parseQuery(params []string) {
-// 	var lenParams int = len(params)
-// 	var index int = 0
-
-// 	reg, _ := regexp.Compile("--([a-z]+)-([a-zA-Z0-9]+)")
-// 	for index < lenParams {
-// 		param := params[index]
-// 		if param == "--"
-// 	}
-// }
