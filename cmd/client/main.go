@@ -28,6 +28,8 @@ func main() {
 		switch args[0] {
 		case "auth":
 			createAuthFile(&currentDir, args[1])
+		case "help":
+			help()
 		case "list":
 			if len(args) >= 2 {
 				listFile(pinataApi, &currentDir, args[1], args[2])
@@ -68,6 +70,10 @@ func initPinata(currDir *string, command string) *pinata.Pinata {
 	pinataApi := pinata.CreatePinata(authPinata.Key, 0, false)
 
 	return pinataApi
+}
+
+func help() {
+	// TODO: help console
 }
 
 func pinFile(pinata *pinata.Pinata, fileDir string) {
@@ -112,7 +118,6 @@ func listFile(pinata *pinata.Pinata, currDir *string, fileName string, query str
 }
 
 func createAuthFile(currDir *string, key string) {
-
 	if key == "" {
 		fmt.Println("Error: must have value")
 		return
