@@ -31,6 +31,7 @@ const (
 type Pinata struct {
 	authentication string
 	pinataOptions  *PinataOptions
+	Loading        bool
 }
 
 type PinataOptions struct {
@@ -74,6 +75,7 @@ func CreatePinata(auth string, cidVersion int8, wrapWithDirectory bool) *Pinata 
 	return &Pinata{
 		authentication: auth,
 		pinataOptions:  &PinataOptions{CidVersion: cidVersion, WrapWithDirectory: wrapWithDirectory},
+		Loading:        false,
 	}
 }
 
@@ -109,6 +111,7 @@ func (pinata *Pinata) RemoveByHash(hash string) {
 }
 
 func (pinata *Pinata) RemoveFiles(rows []PinataRow) {
+	pinata.Loading = true
 	var wg sync.WaitGroup
 	wg.Add(len(rows))
 	for _, row := range rows {
@@ -121,6 +124,7 @@ func (pinata *Pinata) RemoveFiles(rows []PinataRow) {
 
 	wg.Wait()
 	fmt.Println("Finished remove files")
+	pinata.Loading = false
 }
 
 func (pinata *Pinata) DataUsage() {
