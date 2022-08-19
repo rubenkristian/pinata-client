@@ -1,5 +1,0 @@
-package pinata
-
-func statUsage() {
-
-}

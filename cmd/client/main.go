@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"rubenkristian.github.com/pinata-client/pinata"
+	"github.com/rubenkristian/pinata-client-api"
 )
 
 type PinataAuth struct {
@@ -89,7 +89,7 @@ func listFile(pinata *pinata.Pinata, currDir *string, fileName string, query str
 	saveErr := os.WriteFile((*currDir)+"/"+fileName+".json", file, 0644)
 
 	if saveErr != nil {
-		authFileErr := fmt.Errorf("Error: must have value %v", saveErr)
+		authFileErr := fmt.Errorf("error: must have value %v", saveErr)
 		fmt.Println(authFileErr)
 		return
 	} else {
@@ -113,7 +113,7 @@ func createAuthFile(currDir *string, key string) {
 	authErr := os.WriteFile((*currDir)+"/pinata-auth.json", file, 0644)
 
 	if authErr != nil {
-		authFileErr := fmt.Errorf("Error: must have value")
+		authFileErr := fmt.Errorf("error: must have value")
 		fmt.Println(authFileErr)
 		return
 	}
