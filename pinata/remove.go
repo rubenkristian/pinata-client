@@ -2,7 +2,7 @@ package pinata
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -27,7 +27,7 @@ func (pinata *Pinata) removeFile(cid string) ([]byte, error) {
 
 	defer res.Body.Close()
 
-	result, errReadBody := ioutil.ReadAll(res.Body)
+	result, errReadBody := io.ReadAll(res.Body)
 
 	if errReadBody != nil {
 		return nil, errReadBody

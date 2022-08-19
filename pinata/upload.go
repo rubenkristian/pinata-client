@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
 )
 
-func (pinata *Pinata) uploadPinFile(url string, auth string, fileLoc string, name string, keyValues *[]interface{}) ([]byte, error) {
+func (pinata *Pinata) uploadPinFile(url string, auth string, fileLoc string, name string, keyValues *map[string]string) ([]byte, error) {
 	var body []byte = nil
 	payload := &bytes.Buffer{}
 
@@ -21,24 +20,24 @@ func (pinata *Pinata) uploadPinFile(url string, auth string, fileLoc string, nam
 	file, errFile := os.Open(fileLoc)
 
 	if errFile != nil {
-		err := fmt.Errorf("Cannot open file, Some Error equaried %q", errFile.Error())
+		err := fmt.Errorf("cannot open file, some error equaried %q", errFile.Error())
 		return body, err
 	}
 
 	defer file.Close()
 
-	copyFile, errFileCopy := writer.CreateFormFile("file", filepath.Base(fileLoc))
-	_, errFileCopy = io.Copy(copyFile, file)
+	copyFile, _ := writer.CreateFormFile("file", filepath.Base(fileLoc))
+	_, errFileCopy := io.Copy(copyFile, file)
 
 	if errFileCopy != nil {
-		err := fmt.Errorf("Some Error equaried %q", errFileCopy.Error())
+		err := fmt.Errorf("some error equaried %q", errFileCopy.Error())
 		return body, err
 	}
 
 	pinataOptionsJson, errParse := json.Marshal(pinata.pinataOptions)
 
 	if errParse != nil {
-		err := fmt.Errorf("Some Error equaried %q", errParse.Error())
+		err := fmt.Errorf("some error equaried %q", errParse.Error())
 		return body, err
 	}
 
@@ -47,7 +46,7 @@ func (pinata *Pinata) uploadPinFile(url string, auth string, fileLoc string, nam
 	pinataMetadataJson, errParse := json.Marshal(pinataMetadata)
 
 	if errParse != nil {
-		err := fmt.Errorf("Some Error equaried %q", errParse.Error())
+		err := fmt.Errorf("some error equaried %q", errParse.Error())
 		return body, err
 	}
 
@@ -57,7 +56,7 @@ func (pinata *Pinata) uploadPinFile(url string, auth string, fileLoc string, nam
 	errWriter := writer.Close()
 
 	if errWriter != nil {
-		err := fmt.Errorf("Some Error equaried %q", errWriter.Error())
+		err := fmt.Errorf("some error equaried %q", errWriter.Error())
 		return body, err
 	}
 
@@ -66,7 +65,7 @@ func (pinata *Pinata) uploadPinFile(url string, auth string, fileLoc string, nam
 	req, errReq := http.NewRequest(string(POST), url, payload)
 
 	if errReq != nil {
-		err := fmt.Errorf("Some Error equaried %q", errReq.Error())
+		err := fmt.Errorf("some error equaried %q", errReq.Error())
 		return body, err
 	}
 
@@ -76,15 +75,15 @@ func (pinata *Pinata) uploadPinFile(url string, auth string, fileLoc string, nam
 	res, errRes := client.Do(req)
 
 	if errRes != nil {
-		err := fmt.Errorf("Some Error equaried %q", errRes.Error())
+		err := fmt.Errorf("some error equaried %q", errRes.Error())
 		return body, err
 	}
 
 	defer res.Body.Close()
 
-	body, errBody := ioutil.ReadAll(res.Body)
+	body, errBody := io.ReadAll(res.Body)
 	if errBody != nil {
-		err := fmt.Errorf("Some Error equaried %q", errBody.Error())
+		err := fmt.Errorf("some error equaried %q", errBody.Error())
 		return body, err
 	}
 

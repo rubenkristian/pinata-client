@@ -40,8 +40,8 @@ type PinataOptions struct {
 }
 
 type PinataMetadata struct {
-	Name      string         `json:"name"`
-	KeyValues *[]interface{} `json:"keyvalues"`
+	Name      string             `json:"name"`
+	KeyValues *map[string]string `json:"keyvalues"`
 }
 
 type PinataRegion struct {
@@ -79,7 +79,7 @@ func CreatePinata(auth string, cidVersion int8, wrapWithDirectory bool) *Pinata 
 	}
 }
 
-func (pinata *Pinata) PinFile(fileLoc string, name string, keyvalues *[]interface{}) string {
+func (pinata *Pinata) PinFile(fileLoc string, name string, keyvalues *map[string]string) string {
 	_, err := pinata.uploadPinFile(string(PINFILE), pinata.authentication, fileLoc, name, keyvalues)
 
 	if err != nil {
